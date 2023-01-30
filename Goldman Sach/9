@@ -1,0 +1,39 @@
+class Solution {
+public:
+    int findMaximizedCapital(int investmentOpportunities, int initialCapital, vector<int>& profits, vector<int>& capitalRequirements) {
+        // Create an array of pairs, where each pair contains the capital required and its corresponding profit for a project
+        vector <pair <int,int>> projects;
+        for(int i = 0; i<profits.size(); i++) projects.push_back({capitalRequirements[i],profits[i]});
+        // Sort the array by capital required
+        sort(projects.begin(),projects.end());
+        
+        // Use a priority queue to store the profits of projects with capital requirements less than or equal to the current capital
+        priority_queue <int> pq;
+        int currentCapital = initialCapital, i=0;
+        // Continue until no more investments are available or all projects have been considered
+        while(i<projects.size() && investmentOpportunities) {
+            // If the current capital is greater than or equal to the capital requirement of a project
+            if(currentCapital >= projects[i].first) {
+                // add the project to priority queue
+                pq.push(projects[i++].second); 
+            } else {
+                // if there is a project in priority queue with lower capital requirement than current capital, 
+                // we extract the project with highest profit
+                if(!pq.empty()){
+                    currentCapital += pq.top();
+                    pq.pop();
+                    investmentOpportunities--;
+                }
+                else return currentCapital; // no investment opportunities remaining
+            }
+        }
+        // Add remaining projects to the current capital
+        while(!pq.empty() && investmentOpportunities > 0) {
+            currentCapital += pq.top();
+            pq.pop();
+            investmentOpportunities--;
+        }
+        // Return the final capital
+        return currentCapital;
+    }
+};
